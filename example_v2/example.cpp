@@ -7,7 +7,7 @@ using namespace std;
 
 int main(int argc, char* argv[] )
 {
-	for(int i=0;i<1;i++){
+	for(int i=0;i<9;i++){
 		// if(i!=0&&i!=7&&i!=8){
 		// 	continue;
 		// }
@@ -16,7 +16,7 @@ int main(int argc, char* argv[] )
 
 		/*Parameterization of image point*/
 		imagepointtype iptype;
-		for(int j=0;j<2;j++){
+		for(int j=0;j<1;j++){
 			switch(j){
 				case 0:iptype=uv;break;
 				case 1:iptype=light_cone;break;
@@ -54,11 +54,11 @@ int main(int argc, char* argv[] )
 			// r3dtype=quaternion;
 			
 			parametertype paramtype;
-			// paramtype=rotation_translation_landmark;
+			paramtype=rotation_translation_landmark;
 			// paramtype=rotation_translation;
 			// paramtype=rotation_landmark;
 			// paramtype=translation_landmark;
-			paramtype=rotation;
+			// paramtype=rotation;
 			// paramtype=translation;
 			// paramtype=landmark;
 
