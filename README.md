@@ -1,6 +1,25 @@
 # 🚀 CEP
 **Collinearity Equation Parameterization:** A Systematic Benchmarking Study for Bundle Adjustment
-
+```markdown
+- CEP
+  - Image Point Parameterization
+    - UV-coordinate
+    - Light cone
+  - Object Point Parameterization
+    - Cartesian coordinate
+    - Spherical coordinate
+    - Inverse distance
+    - Inverse depth (0 anchor)
+    - Cartesian coordinate (1 anchor)
+    - Spherical coordinate (1 anchor)
+    - Inverse distance (1 anchor)
+    - Inverse depth (1 anchor)
+    - Parallax angle (2 anchors)
+  - 3D Rotation
+    - Euler angle
+    - Axis angle
+    - Quaternion
+    - Rotation matrix
 ---
 
 ## 🖥 Tested Platforms
