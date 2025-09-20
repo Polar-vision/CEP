@@ -15,8 +15,8 @@ This project has been tested on:
 
 ## 📦 Dependencies
 - **Ceres-solver**: 2.2.0  
-- **cuDSS**  
-- **Sophus**  
+- **cuDSS**: 0.5.0  
+- **Sophus**: 1.24.6  
 - **Eigen**: 3.3.5  
 
 ---
