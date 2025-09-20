@@ -20,6 +20,7 @@
     - Axis angle
     - Quaternion
     - Rotation matrix
+```
 ---
 
 ## 🖥 Tested Platforms
