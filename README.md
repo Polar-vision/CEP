@@ -17,7 +17,7 @@
 ```bash
 git clone https://github.com/Polar-vision/CEP.git
 cd CEP
-
+```
 
 ### 2. Build the BA library (ba_v2)
 ```bash
@@ -31,7 +31,8 @@ cmake -B build -S . ^
   -Dcudss_DIR="<path_to_cudss>/lib/12/cmake/cudss" ^
   -G "Visual Studio 17 2022" -A x64
 
-cmake --build build --config Release 
+cmake --build build --config Release
+```
 
 ### 3. Build the example program (example_v2)
 ```bash
@@ -44,3 +45,4 @@ cmake -B build -S . ^
   -G "Visual Studio 17 2022" -A x64
 
 cmake --build build --config Release
+```
