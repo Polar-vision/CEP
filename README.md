@@ -1,9 +1,9 @@
-# CEP
+# 🚀 CEP
 **Collinearity Equation Parameterization:** A Systematic Benchmarking Study for Bundle Adjustment
 
 ---
 
-## Dependencies
+## 📦 Dependencies
 - **Ceres-solver**: 2.2.0  
 - **cuDSS**  
 - **Sophus**  
@@ -11,15 +11,15 @@
 
 ---
 
-## Installation
+## ⚙️ Installation
 
-### 1. Clone the repository
+### 1️⃣ Clone the repository
 ```bash
 git clone https://github.com/Polar-vision/CEP.git
 cd CEP
 ```
 
-### 2. Build the BA library (ba_v2)
+### 2️⃣ Build the BA library (ba_v2)
 ```bash
 cd ba_v2
 mkdir build
@@ -34,7 +34,7 @@ cmake -B build -S . ^
 cmake --build build --config Release
 ```
 
-### 3. Build the demo (example_v2)
+### 3️⃣ Build the demo (example_v2)
 ```bash
 cd ../example_v2
 mkdir build
