@@ -3,13 +3,14 @@
 
 ---
 
-## 💻 Supported Platforms
+## 🖥 Tested Platforms
+This project has been tested on:
 
-| Platform       | Notes / Requirements                                 |
-|----------------|------------------------------------------------------|
-| Windows 10/11  | Visual Studio 2022 (x64), CMake ≥ 3.10, Vcpkg       |
-| Linux (Ubuntu) | GCC ≥ 9, CMake ≥ 3.10, Vcpkg                        |
-| macOS          | Clang, CMake ≥ 3.10, Homebrew or Vcpkg              |
+- **Operating System:** Windows 11  
+- **Compiler / IDE:** Visual Studio 2022 (x64)  
+- **CMake version:** ≥ 3.10  
+
+> Note: Other platforms may work, but they have not been verified.
 
 
 ## 📦 Dependencies
