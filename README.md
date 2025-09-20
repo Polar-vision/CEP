@@ -3,6 +3,15 @@
 
 ---
 
+## 💻 Supported Platforms
+
+| Platform       | Notes / Requirements                                 |
+|----------------|------------------------------------------------------|
+| Windows 10/11  | Visual Studio 2022 (x64), CMake ≥ 3.10, Vcpkg       |
+| Linux (Ubuntu) | GCC ≥ 9, CMake ≥ 3.10, Vcpkg                        |
+| macOS          | Clang, CMake ≥ 3.10, Homebrew or Vcpkg              |
+
+
 ## 📦 Dependencies
 - **Ceres-solver**: 2.2.0  
 - **cuDSS**  
