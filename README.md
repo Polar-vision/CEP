@@ -34,7 +34,7 @@ cmake -B build -S . ^
 cmake --build build --config Release
 ```
 
-### 3. Build the example program (example_v2)
+### 3. Build the demo (example_v2)
 ```bash
 cd ../example_v2
 mkdir build
