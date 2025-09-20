@@ -10,6 +10,7 @@ cd CEP
 cd ba_v2  
 mkdir build  
 
+```bash
 cmake -B build -S . ^  
 -DCMAKE_TOOLCHAIN_FILE=<VCPKG_ROOT>\scripts\buildsystems\vcpkg.cmake ^  
 -DEIGEN3_INCLUDE_DIR=<PATH_TO_THIRD_PARTY>/eigen3 ^  
