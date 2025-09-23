@@ -66,8 +66,8 @@ You can download the datasets from the following links:
 
 | Dataset | Description | Download Link |
 |---------|-------------|---------------|
-| Close-Range (CR) | Small-scale indoor/outdoor scenes | [Download CR](https://example.com/download/cr) |
-| UAV Oblique (UAV) | UAV imagery for oblique photogrammetry | [Download UAV](https://example.com/download/uav) |
-| Vehicle-mounted (VM) | Vehicle-mounted multi-camera data | [Download VM](https://example.com/download/vm) |
-| Multi-camera Oblique (MCO) | Multi-camera oblique aerial datasets | [Download MCO](https://example.com/download/mco) |
+| Close-Range (CR) | Small-scale indoor/outdoor scenes | [Download CR](https://drive.google.com/drive/folders/1mvsQEFGBvZ-VcfxIJ3hqXiBV3tVTPMSe) |
+| UAV Oblique (UAV) | UAV imagery for oblique photogrammetry | [Download UAV](https://drive.google.com/drive/folders/1-VA-JrVe03PVZnswjuLAvx_EC7vqzSXN) |
+| Vehicle-mounted (KD) | Vehicle-mounted multi-camera data | [Download VM](https://drive.google.com/drive/folders/1_GID2a5O5CSfUn5QfoWFhhnA_NwI5kmi) |
+| Multi-camera Oblique (LM) | Multi-camera oblique aerial datasets | [Download MCO](https://drive.google.com/drive/folders/1NDOMrSZocyTG7JEdLQ7KdujHUKDikmQa) |
 ---
