@@ -73,18 +73,22 @@ You can download the datasets from the following links:
 ---
 ## 🗂 Data Format
 
-Each dataset is provided in the following structure:
+Each dataset is organized in the following structure:
 
-- **Intrinsics (cal.txt):**  
-  Each file contains `fx, fy, cx, cy` for each camera.  
-- **Extrinsics (Cam.txt):**  
-  Each file contains Euler angles (e.g., ey, ex, ez), perspective center (Xc, Yc, Zc), and camera ID.
-  ey is an angle rotated around y axis
-  ex is an angle rotated around x axis
-  ez is an angle rotated around z axis
-- **Points3D (XYZ.txt):**  
-  Contains X, Y, Z coordinates of the object points.  
-- **Tracks (Feature.txt):**  
-  Each line represents a feature track: number of views, image indices, and corresponding (u,v) coordinates.  
+- **Intrinsics (`cal.txt`)**  
+  Contains the camera intrinsic parameters: `fx`, `fy`, `cx`, `cy` for each camera.
+
+- **Extrinsics (`Cam.txt`)**  
+  Contains the camera poses, including Euler angles (`ey`, `ex`, `ez`), the perspective center `(Xc, Yc, Zc)`, and the camera ID.  
+  - `ey` : rotation around the y-axis  
+  - `ex` : rotation around the x-axis  
+  - `ez` : rotation around the z-axis
+
+- **3D Points (`XYZ.txt`)**  
+  Lists the 3D coordinates of the object points: `X`, `Y`, `Z`.
+
+- **Feature Tracks (`Feature.txt`)**  
+  Each line represents a feature track, including the number of views, the corresponding image indices, and the (u, v) coordinates in each image.
+
 
 ---
