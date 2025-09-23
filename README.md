@@ -54,3 +54,20 @@ cmake -B build -S . ^
 
 cmake --build build --config Release
 ```
+# 🚀 Datasets
+
+This repository provides a set of datasets used for benchmarking **Bundle Adjustment** under the Collinearity Equation Parameterization (CEP) framework.  
+
+---
+
+## 📥 Download
+
+You can download the datasets from the following links:
+
+| Dataset | Description | Download Link |
+|---------|-------------|---------------|
+| Close-Range (CR) | Small-scale indoor/outdoor scenes | [Download CR](https://example.com/download/cr) |
+| UAV Oblique (UAV) | UAV imagery for oblique photogrammetry | [Download UAV](https://example.com/download/uav) |
+| Vehicle-mounted (VM) | Vehicle-mounted multi-camera data | [Download VM](https://example.com/download/vm) |
+| Multi-camera Oblique (MCO) | Multi-camera oblique aerial datasets | [Download MCO](https://example.com/download/mco) |
+---
