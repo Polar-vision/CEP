@@ -1,4 +1,4 @@
-# 🚀 CEP
+# 🚀 Building from Source Code
 **Collinearity Equation Parameterization:** A Systematic Benchmarking Study for Bundle Adjustment  
 
 ## 🖥 Tested Platforms
