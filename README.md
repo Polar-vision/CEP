@@ -1,4 +1,4 @@
-# 🚀 Building from Source Code
+# 🚀 Building from Source
 **Collinearity Equation Parameterization:** A Systematic Benchmarking Study for Bundle Adjustment  
 
 ## 🖥 Tested Platforms
