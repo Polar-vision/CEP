@@ -55,7 +55,7 @@ public:
 	void ba_readCameraPoseration(char* fname, double* ical);
 	void readNpointsAndNprojections(FILE* fp, int* n3Dpts, int pnp, int* nprojs, int mnp);
 	void ba_readCameraPose(FILE* fp, double* params, int* m_v);
-	void ba_updateKR(double* KR, double* KdA, double* KdB, double* KdG, double* K, double* p);
+	void ba_updateKR(double* KR, double* K, double* p);
 	int readNInts(FILE* fp, int* vals, int nvals);
 	int readNDoubles(FILE* fp, double* vals, int nvals);
 	int countNDoubles(FILE* fp);

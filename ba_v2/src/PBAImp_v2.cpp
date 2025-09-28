@@ -431,6 +431,31 @@ void PBA::archored_xyz2xyz(){
 		points[i].xyz[2] = cams[nM].camera_center[2] + points[i].archored_xyz[2];
 	}
 }
+void EulerAnglesToRotationMatrix(double eulerAngles[3],double R[9]){
+	double ey = eulerAngles[0];
+	double ex = eulerAngles[1];
+	double ez = eulerAngles[2];
+	double c1 = cos(ey);   double c2 = cos(ex);   double c3 = cos(ez);
+	double s1 = sin(ey);   double s2 = sin(ex);   double s3 = sin(ez);
+	R[0]=c1*c3-s1*s2*s3;     R[1]=c2*s3;     R[2]=s1*c3+c1*s2*s3;
+	R[3]=-c1*s3-s1*s2*c3;    R[4]=c2*c3;     R[5]=-s1*s3+c1*s2*c3;
+	R[6]=-s1*c2;             R[7]=-s2;       R[8]=c1*c2;
+}
+void SimEulerAngleToRotationMatrix(double eulerAngles[2],double R[9]){
+	double ey = eulerAngles[0];
+	double ex = eulerAngles[1];
+	double c1 = cos(ey);
+	double c2 = cos(ex);
+	double s1 = sin(ey);
+	double s2 = sin(ex);
+	R[0]=c1;       R[1]=0;           R[2]=s1;
+	R[3]=-s1*s2;   R[4]=c2;          R[5]=c1*s2;
+	R[6]=-s1*c2;   R[7]=-s2;         R[8]=c1*c2;
+}
+void SimRotationMatrixToEulerAngle(double R[9],double eulerAngles[2]){
+	eulerAngles[0] = atan2(R[2],R[0]);
+	eulerAngles[1] = atan2(-R[7],R[4]);
+}
 void rotationMatrixToEulerAngles_phi_omega_kappa(double R[9], double eulerAngles[3])
 {
 	//assert(isRotationMatrix(R));
@@ -663,9 +688,15 @@ double PBA::costFuc(){
 	double R[9],u,v,fx,fy,cx,cy,ey,ex,ez,c1,c2,c3,s1,s2,s3,Xc[3],p[3],xp,yp,predicted_u,predicted_v,residuals[2],err=0;
 	int nobs=0,cam_idx,view_idx;
 	// int k1=0,k2=0;
+	// int it_id = 0;
 	for (auto &kv : image_tracks) {
 		// k1++;
 		// k2=0;
+		// it_id++;
+		// if(it_id!=2){
+		// 	continue;
+		// }
+		
 		int view_idx = kv.first;
 		auto &obs_list = kv.second;
 		nobs+=obs_list.size();
@@ -736,15 +767,26 @@ void PBA::randCam(ParameterType paramtype){
 				cams[i].camera_center[1]=dist5(gen);
 				cams[i].camera_center[2]=dist6(gen);
 			}
-			cams[i].euler_angle[0]=dist1(gen);
-			cams[i].euler_angle[1]=dist2(gen);
-			cams[i].euler_angle[2]=dist3(gen);
+			// cams[i].euler_angle[0]=dist1(gen);
+			// cams[i].euler_angle[1]=dist2(gen);
+			// cams[i].euler_angle[2]=dist3(gen);
+
+			cams[i].euler_angle[0]=0;
+			cams[i].euler_angle[1]=0;
+			cams[i].euler_angle[2]=0;
 			
 			fprintf(fp,"%lf %lf %lf %lf %lf %lf %d\n",cams[i].euler_angle[0],cams[i].euler_angle[1],cams[i].euler_angle[2],
 			cams[i].camera_center[0],cams[i].camera_center[1],cams[i].camera_center[2],cams[i].camidx);
 		}
 		fclose(fp);
 	}
+}
+// 将角度规范到 [-PI/2, PI/2]
+double NormalizeHalfPi(double angle) {
+    // 对 pitch/roll 来说，超过 ±π/2 需要取补角
+    while (angle > PI/2)  angle -= PI;
+    while (angle < -PI/2) angle += PI;
+    return angle;
 }
 bool PBA::ba_run(char* szCam,
 	char* szFea,
@@ -864,7 +906,12 @@ bool PBA::ba_run(char* szCam,
 	if(paramtype==rotation || paramtype==rotation_translation || paramtype==translation)
 	{
 		IFeature();
+		// int im_id = 0;
 		for (auto &kv : image_tracks) {
+			// im_id++;
+			// if(im_id!=2){
+			// 	continue;
+			// }
 			int view_idx = kv.first;
 			auto &obs_list = kv.second;
 			nobs+=obs_list.size();
@@ -904,6 +951,7 @@ bool PBA::ba_run(char* szCam,
 						cams[view_idx].camera_center[0],cams[view_idx].camera_center[1],cams[view_idx].camera_center[2]);
 					problem.AddResidualBlock(
 						cost_function,
+						// loss_function,
 						nullptr, // loss_function
 						&cams[view_idx].euler_angle[0]);
 				}
@@ -913,11 +961,11 @@ bool PBA::ba_run(char* szCam,
 												cams[view_idx].camera_center[0],cams[view_idx].camera_center[1],cams[view_idx].camera_center[2]);
 					problem.AddResidualBlock(
 						cost_function,
+						// loss_function,
 						nullptr,
 						&cams[view_idx].euler_angle[0]);
 				}
 			}
-
 		}
 		// if(iptype==light_cone){
 		// 	initial_cost=costFuc();
@@ -1304,16 +1352,55 @@ bool PBA::ba_run(char* szCam,
 	// 	get_yaw_from_polar();
 	// 	final_cost= costFuc();
 	// }
+	string originalPath(m_szXYZ);
+	size_t pos = originalPath.find_last_of("/\\");
+	string parentPath = (pos != std::string::npos) ? originalPath.substr(0, pos) : "";
 	final_cost= costFuc();
 	if(iptype == uv){
 		// final_cost = lc_rep();
 	}
 	else if(iptype == light_cone){
+		//输出结果
+		string opt_cam_tmp = parentPath + "/Cam_" + str + "_temp.txt";
+		if(opt_cam_tmp.c_str()!=NULL){
+			FILE *fp = nullptr;
+			fopen_s(&fp, opt_cam_tmp.c_str(), "w");
+			if(r3dtype==axis_angle){
+				for(int i=0;i<cams.size();i++){
+					axis2euc(cams[i].axis_angle,cams[i].euler_angle);
+				}
+			}
+			if(r3dtype==quaternion){
+				for(int i=0;i<cams.size();i++){
+					q2euc(cams[i].quat,cams[i].euler_angle);
+				}
+			}
+			for (int i = 0; i < cams.size(); i++){
+				// double R[9];
+				// SimEulerAngleToRotationMatrix(cams[i].euler_angle,R);
+				// SimRotationMatrixToEulerAngle(R,cams[i].euler_angle);
+				// double ey  = NormalizeHalfPi(cams[i].euler_angle[0]);
+    			// double ex = NormalizeHalfPi(cams[i].euler_angle[1]);	
+				// cams[i].euler_angle[0] = ey;
+				// cams[i].euler_angle[1] = ex;
+				// if(i!=1){
+				// 	continue;
+				// }
+				fprintf(fp, "%lf %lf %lf %lf %lf %lf\n", cams[i].euler_angle[0], cams[i].euler_angle[1], cams[i].euler_angle[2],
+											cams[i].camera_center[0],cams[i].camera_center[1],cams[i].camera_center[2]);
+			}
+			fclose(fp);
+		}
 		printf("get yaw from polar\n");
 		get_yaw_from_polar();
 		ceres::Problem problem1;
+		// int im_id = 0;
 		for (auto &kv : image_tracks) {
 			int view_idx = kv.first;
+			// im_id++;
+			// if(im_id!=2){
+			// 	continue;
+			// }
 			auto &obs_list = kv.second;
 			for (auto &obs : obs_list) {
 				int i=obs.feature_idx;
@@ -1331,6 +1418,7 @@ bool PBA::ba_run(char* szCam,
 									cams[view_idx].camera_center[0],cams[view_idx].camera_center[1],cams[view_idx].camera_center[2]);
 					problem1.AddResidualBlock(
 						cost_function,
+						// loss_function,
 						nullptr,
 						&cams[view_idx].euler_angle[0]);
 				}
@@ -1367,9 +1455,7 @@ bool PBA::ba_run(char* szCam,
 	
 	// // printf("%f %s %f\n", ini_err, " to ", fin_err);
 
-	string originalPath(m_szXYZ);
-	size_t pos = originalPath.find_last_of("/\\");
-	string parentPath = (pos != std::string::npos) ? originalPath.substr(0, pos) : "";
+
 	string converge_curve = parentPath + "/convergence_" + str + ".txt";
 	string opt_point = parentPath + "/XYZ_" + str + ".ply";
 	string opt_cam = parentPath + "/Cam_" + str + ".txt";
@@ -1387,6 +1473,16 @@ bool PBA::ba_run(char* szCam,
 			}
 		}
 		for (int i = 0; i < cams.size(); i++){
+			// if(i!=1){
+			// 	continue;
+			// }
+			double R[9];
+			EulerAnglesToRotationMatrix(cams[i].euler_angle,R);
+			rotationMatrixToEulerAngles_phi_omega_kappa(R,cams[i].euler_angle);
+			// double ey  = NormalizeHalfPi(cams[i].euler_angle[0]);
+			// double ex = NormalizeHalfPi(cams[i].euler_angle[1]);	
+			// cams[i].euler_angle[0] = ey;
+			// cams[i].euler_angle[1] = ex;
 			fprintf(fp, "%lf %lf %lf %lf %lf %lf\n", cams[i].euler_angle[0], cams[i].euler_angle[1], cams[i].euler_angle[2],
 			                             cams[i].camera_center[0],cams[i].camera_center[1],cams[i].camera_center[2]);
 		}
@@ -1441,6 +1537,9 @@ bool PBA::ba_run(char* szCam,
 		for (int i = 0; i < cost_per_iteration.size(); ++i) {
 			if(iptype==light_cone){
 				for(int j=0;j<num_cams;j++){
+					// if(j!=1){
+					// 	continue;
+					// }
 					cams[j].euler_angle[0] = euler_history[i][j*6 + 0];
 					cams[j].euler_angle[1] = euler_history[i][j*6 + 1];
 					cams[j].euler_angle[2] = euler_history[i][j*6 + 2];
@@ -1463,6 +1562,9 @@ bool PBA::ba_run(char* szCam,
 		if(iptype==light_cone){
 			for (int i = 0; i < cost_per_iteration1.size(); ++i) {
 				for(int j=0;j<num_cams;j++){
+					// if(j!=1){
+					// 	continue;
+					// }
 					cams[j].euler_angle[0] = euler_history1[i][j*6 + 0];
 					cams[j].euler_angle[1] = euler_history1[i][j*6 + 1];
 					cams[j].euler_angle[2] = euler_history1[i][j*6 + 2];
@@ -1820,7 +1922,7 @@ void PBA::pba_readAndInitialize(char *camsfname, char *ptsfname,char *calibfname
 	m_KdB = (double*)malloc(m_ncams*9*sizeof(double));
 	m_KdG = (double*)malloc(m_ncams*9*sizeof(double));
 	
-	ba_updateKR(m_KR, m_KdA, m_KdB, m_KdG, m_K, *motstruct);
+	ba_updateKR(m_KR, m_K, *motstruct);
 
 	//if XYZ are provided, we can use them as feature initialization.
 	// fprintf(stdout, "%s\n", m_bProvideXYZ ? "true" : "false");  
