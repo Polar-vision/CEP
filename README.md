@@ -21,6 +21,8 @@ The current local configuration has been tested with:
 - Eigen: 5.0.1, from vcpkg
 - Sophus: 1.24.6, from vcpkg
 
+See [Build Ceres Solver 2.3.0-dev on Windows](docs/CERES_WINDOWS_BUILD.md) for the Ceres source build used by this branch.
+
 Install the vcpkg packages used by CEP and the Ceres build:
 
 ```bat
