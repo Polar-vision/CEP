@@ -93,6 +93,10 @@ options.sparse_linear_algebra_library_type = ceres::SUITE_SPARSE;
 
 This matches the Ceres build with SuiteSparse and avoids the previous CUDA Sparse/cuDSS requirement.
 
+## Synthetic Tests
+
+See [Synthetic Parallax Short-Baseline Test](docs/SYNTHETIC_PARALLAX_TEST.md) for a fixed-camera synthetic check of the CEP parallax parameterization under weak-baseline geometry.
+
 ## Datasets
 
 This repository benchmarks bundle adjustment datasets under the CEP framework. Download links:

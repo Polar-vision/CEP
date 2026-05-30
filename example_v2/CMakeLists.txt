@@ -69,6 +69,33 @@ add_custom_command(TARGET example POST_BUILD
     COMMAND_EXPAND_LISTS
 )
 
+add_executable(synthetic_parallax_test synthetic_parallax_test.cpp)
+set_target_properties(synthetic_parallax_test PROPERTIES LINK_FLAGS "/SAFESEH:NO")
+if(MSVC)
+    target_compile_options(synthetic_parallax_test PRIVATE /EHsc)
+endif()
+target_include_directories(synthetic_parallax_test PRIVATE
+    ${BA_INCLUDE_DIR}
+    ${BA_PROJECT_DIR}/src
+    ${BA_PROJECT_DIR}/../3rdparty
+)
+target_link_libraries(synthetic_parallax_test PRIVATE
+    "${BA_LIB_DIR}/ba.lib"
+    Ceres::ceres
+)
+add_custom_command(TARGET synthetic_parallax_test POST_BUILD
+    COMMAND ${CMAKE_COMMAND}
+    "-Dsrc_dir=${BA_LIB_DIR}"
+    "-Ddst_dir=$<TARGET_FILE_DIR:synthetic_parallax_test>"
+    -P "${COPY_BA_RUNTIME_DLLS_SCRIPT}"
+    VERBATIM
+)
+add_custom_command(TARGET synthetic_parallax_test POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+    $<TARGET_RUNTIME_DLLS:synthetic_parallax_test> $<TARGET_FILE_DIR:synthetic_parallax_test>
+    COMMAND_EXPAND_LISTS
+)
+
 
 
 # cmake_minimum_required(VERSION 3.10)
