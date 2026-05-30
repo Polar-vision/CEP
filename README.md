@@ -108,7 +108,7 @@ For the current Windows workspace, place datasets here:
 C:\zuo\Projects\BA Datasets
 ```
 
-`3rdparty/dataPath.h` uses paths relative to `example_v2\build`. For example:
+`3rdparty/dataPath.h` uses paths relative to the directory containing `example.exe`. For the default build this is `example_v2\build`, so the example can be launched from any working directory. For example:
 
 ```cpp
 static const char* dt = "../../../../BA Datasets/Close-Range/CR1-problem-11-9611/Initial Value/cal.txt";

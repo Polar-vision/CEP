@@ -1,12 +1,25 @@
 #include "BAExporter_v2.h"
 #include "dataPath.h"
+#include <filesystem>
 #include <vector>
 #include <map>
 #include <string>
 using namespace std;
+namespace fs = std::filesystem;
 
 int main(int argc, char* argv[] )
 {
+	fs::path executableDir = fs::absolute(argv[0]).parent_path();
+	fs::path dataPath = fs::path(dt);
+	if (dataPath.is_relative()) {
+		dataPath = executableDir / dataPath;
+	}
+	dataPath = fs::weakly_canonical(dataPath);
+	if (!fs::exists(dataPath)) {
+		printf("Missing data file: %s\n", dataPath.string().c_str());
+		return 1;
+	}
+
 	for(int i=0;i<9;i++){
 		// if(i!=0&&i!=7&&i!=8){
 		// 	continue;
@@ -145,13 +158,13 @@ int main(int argc, char* argv[] )
 			}
 
 			string pCheck = string(object_point_type)+"_"+rotation_3d_type+"_"+image_point_type;
-			string originalPath(dt);
+			string originalPath = dataPath.string();
 			size_t pos = originalPath.find_last_of("/\\");
 			string parentPath = (pos != string::npos) ? originalPath.substr(0, pos) : "";
 			string pP = parentPath + "/";
-			string p1 = pP + "Cam.txt";//被噪声污染后的外参
+			string p1 = pP + "Cam.txt";// noisy initial camera poses
 			string p2 = pP + "Feature.txt";
-			string p3 = pP + "XYZ.txt";//重新三角化后的物点
+			string p3 = pP + "XYZ.txt";// retriangulated object points
 			string p4 = pP + "cal.txt";
 			string pReport = "-report.txt";
 			string pPose = "-FinalPose.txt";
