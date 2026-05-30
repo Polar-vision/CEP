@@ -47,7 +47,8 @@ public:
     					rotation3dtype r3dtype,
 						imagepointtype iptype,
 						parametertype paramtype,
-    					manifoldtype manitype)=0;
+						manifoldtype manitype,
+						BAResult* result = NULL)=0;
 
 	virtual bool ba_initialize(char* szCamera, char* szFeature, char* szCalib = NULL, char* szXYZ = NULL)=0;
 

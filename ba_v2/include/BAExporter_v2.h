@@ -56,6 +56,30 @@ typedef enum ManifoldType{
 	none=5
 }manifoldtype;
 
+struct BAResult {
+	objectpointtype optype = xyz;
+	rotation3dtype r3dtype = euler_angle;
+	imagepointtype iptype = uv;
+	parametertype paramtype = rotation_translation_landmark;
+	manifoldtype manitype = none;
+	int num_cameras = 0;
+	int num_points = 0;
+	int num_observations = 0;
+	int num_iterations = 0;
+	int num_successful_steps = 0;
+	int num_unsuccessful_steps = 0;
+	int num_linear_solves = 0;
+	int termination_type = 0;
+	double initial_cost = 0.0;
+	double final_cost = 0.0;
+	double initial_rms = 0.0;
+	double final_rms = 0.0;
+	double total_time_sec = 0.0;
+	double minimizer_time_sec = 0.0;
+	double linear_solver_time_sec = 0.0;
+	double residual_evaluation_time_sec = 0.0;
+	double jacobian_evaluation_time_sec = 0.0;
+};
 class IBA;//PBA和SBA的基类
 class BAapi BAExporter
 {
@@ -71,7 +95,8 @@ public:
 				rotation3dtype r3dtype = euler_angle,
 				imagepointtype iptype = uv,
 				parametertype paramtype = rotation_translation_landmark,
-				manifoldtype manitype = none);
+				manifoldtype manitype = none,
+				BAResult* result = NULL);
 
 	bool ba_initialize( char* szCamera, char* szFeature, char* szCalib =  NULL, char* szXYZ = NULL );
 

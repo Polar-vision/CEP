@@ -11,8 +11,8 @@ BAExporter::~BAExporter(){
 
 bool BAExporter::ba_run(char* szCam, char* szFea, char* szXYZ, char* szCalib, char* szReport,
 	char* szPose, char* sz3D, objectpointtype optype, rotation3dtype r3dtype,imagepointtype iptype,
-						parametertype paramtype,manifoldtype manitype){
-	return ptr->ba_run(szCam, szFea, szXYZ, szCalib, szReport, szPose, sz3D, optype, r3dtype,iptype,paramtype,manitype);
+						parametertype paramtype,manifoldtype manitype, BAResult* result){
+	return ptr->ba_run(szCam, szFea, szXYZ, szCalib, szReport, szPose, sz3D, optype, r3dtype,iptype,paramtype,manitype,result);
 }
 
 bool BAExporter::ba_initialize(char* szCamera, char* szFeature, char* szCalib, char* szXYZ){

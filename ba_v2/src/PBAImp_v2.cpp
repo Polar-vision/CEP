@@ -10,13 +10,7 @@ PBA::PBA(void)
 
 PBA::~PBA(void)
 {
-	if ( m_szCameraInit!= NULL)	free(m_szCameraInit);
-	if ( m_szFeatures!= NULL)	free(m_szFeatures);
-	if ( m_szCalibration!= NULL)	free(m_szCalibration);
-	if ( m_szXYZ!= NULL)		free(m_szXYZ);
-	if ( m_szCamePose!= NULL)	free(m_szCamePose);
-	if ( m_sz3Dpts!= NULL)		free(m_sz3Dpts);
-	if ( m_szReport!= NULL)		free(m_szReport);
+	// Input path pointers are borrowed from the caller.
 }
 
 double light_cone_obs(double u, double v, 
@@ -799,7 +793,8 @@ bool PBA::ba_run(char* szCam,
     rotation3dtype r3dtype,
     imagepointtype iptype,
 	parametertype paramtype,
-    manifoldtype manitype)
+    manifoldtype manitype,
+    BAResult* result)
 {
 	m_szCameraInit = szCam;                                                       
 	m_szFeatures   = szFea;                                                       
@@ -1605,6 +1600,59 @@ bool PBA::ba_run(char* szCam,
 	// // printf("%f %s %f\n", initial_cost*2/nobs, " to ", final_cost*2/nobs);
 	// printf("%f %s %f\n", sqrt(initial_cost/nobs), " to ", sqrt(final_cost/nobs));
 
+	if (result != NULL) {
+		result->optype = optype;
+		result->r3dtype = r3dtype;
+		result->iptype = iptype;
+		result->paramtype = paramtype;
+		result->manitype = manitype;
+		result->num_cameras = m_ncams;
+		result->num_points = m_n3Dpts;
+		result->num_observations = nobs;
+		result->num_iterations = static_cast<int>(summary.iterations.size());
+		result->num_successful_steps = summary.num_successful_steps;
+		result->num_unsuccessful_steps = summary.num_unsuccessful_steps;
+		result->num_linear_solves = summary.num_linear_solves;
+		result->termination_type = static_cast<int>(summary.termination_type);
+		result->initial_cost = summary.initial_cost;
+		result->final_cost = summary.final_cost;
+		result->initial_rms = nobs > 0 ? sqrt(summary.initial_cost / nobs) : 0.0;
+		result->final_rms = nobs > 0 ? sqrt(summary.final_cost / nobs) : 0.0;
+		result->total_time_sec = summary.total_time_in_seconds;
+		result->minimizer_time_sec = summary.minimizer_time_in_seconds;
+		result->linear_solver_time_sec = summary.linear_solver_time_in_seconds;
+		result->residual_evaluation_time_sec = summary.residual_evaluation_time_in_seconds;
+		result->jacobian_evaluation_time_sec = summary.jacobian_evaluation_time_in_seconds;
+	}
+
+	if (m_szReport != NULL) {
+		FILE* fp = nullptr;
+		fopen_s(&fp, m_szReport, "w");
+		if (fp != NULL) {
+			fprintf(fp, "method,%s\n", object_point_type);
+			fprintf(fp, "rotation,%s\n", rotation_3d_type);
+			fprintf(fp, "image,%s\n", image_point_type);
+			fprintf(fp, "parameter,%s\n", parameter_type);
+			fprintf(fp, "manifold,%s\n", manifold_type);
+			fprintf(fp, "num_cameras,%d\n", m_ncams);
+			fprintf(fp, "num_points,%d\n", m_n3Dpts);
+			fprintf(fp, "num_observations,%d\n", nobs);
+			fprintf(fp, "iterations,%d\n", static_cast<int>(summary.iterations.size()));
+			fprintf(fp, "successful_steps,%d\n", summary.num_successful_steps);
+			fprintf(fp, "unsuccessful_steps,%d\n", summary.num_unsuccessful_steps);
+			fprintf(fp, "initial_cost,%.17g\n", summary.initial_cost);
+			fprintf(fp, "final_cost,%.17g\n", summary.final_cost);
+			fprintf(fp, "initial_rms,%.17g\n", nobs > 0 ? sqrt(summary.initial_cost / nobs) : 0.0);
+			fprintf(fp, "final_rms,%.17g\n", nobs > 0 ? sqrt(summary.final_cost / nobs) : 0.0);
+			fprintf(fp, "total_time_sec,%.17g\n", summary.total_time_in_seconds);
+			fprintf(fp, "minimizer_time_sec,%.17g\n", summary.minimizer_time_in_seconds);
+			fprintf(fp, "linear_solver_time_sec,%.17g\n", summary.linear_solver_time_in_seconds);
+			fprintf(fp, "termination,%s\n", ceres::TerminationTypeToString(summary.termination_type));
+			std::string full_report = summary.FullReport();
+			fprintf(fp, "\n%s\n", full_report.c_str());
+			fclose(fp);
+		}
+	}
 	return true;
 }
 

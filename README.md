@@ -82,6 +82,11 @@ cmake --build C:\zuo\Projects\repos\CEP\example_v2\build -j
 
 The example build copies `ba.dll` and the required runtime DLLs next to `example.exe`.
 
+Running `example.exe` evaluates the nine object-point parameterizations configured in `example_v2/example.cpp` and writes comparison tables next to the selected dataset:
+
+- `BA-comparison.csv`: full numeric summary for post-processing
+- `BA-comparison.md`: compact Markdown table for quick inspection
+
 ## Solver Backend
 
 `ba_v2/src/PBAImp_v2.cpp` uses:
