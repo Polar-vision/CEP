@@ -87,6 +87,22 @@ Running `example.exe` evaluates the nine object-point parameterizations configur
 - `BA-comparison.csv`: full numeric summary for post-processing
 - `BA-comparison.md`: compact Markdown table for quick inspection
 
+## Method Naming
+
+The comparison tables use normalized method names and keep the original CEP enum/function name in the `code_name` column. The historical code name `inverse_depth` represents bearing plus inverse Euclidean range, so it is reported as `world_bearing_inverse_range` to avoid confusing it with the `xy_inverse_z` parameterization.
+
+| Anchor mode | Normalized method name | CEP code name | Point parameters |
+| --- | --- | --- | --- |
+| `world_frame` | `world_cartesian_xyz` | `xyz` | `(X, Y, Z)` in the world frame |
+| `world_frame` | `world_xy_inverse_z` | `xy_inverse_z` | `(X, Y, 1/Z)` in the world frame |
+| `world_frame` | `world_bearing_range` | `depth` | world bearing angles plus range |
+| `world_frame` | `world_bearing_inverse_range` | `inverse_depth` | world bearing angles plus inverse range |
+| `single_anchor` | `anchored_cartesian_xyz` | `archored_xyz` | offset `(dX, dY, dZ)` from the main anchor |
+| `single_anchor` | `anchored_xy_inverse_z` | `archored_xy_inverse_z` | offset `(dX, dY, 1/dZ)` from the main anchor |
+| `single_anchor` | `anchored_bearing_range` | `archored_depth` | main-anchor bearing angles plus range |
+| `single_anchor` | `anchored_bearing_inverse_range` | `archored_inverse_depth` | main-anchor bearing angles plus inverse range |
+| `dual_anchor` | `dual_anchor_bearing_parallax` | `parallax` | main-anchor bearing angles plus parallax angle to the associate anchor |
+
 ## Solver Backend
 
 `ba_v2/src/PBAImp_v2.cpp` uses:

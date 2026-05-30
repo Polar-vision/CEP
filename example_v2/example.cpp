@@ -43,15 +43,15 @@ const char* comparisonMethodName(objectpointtype optype)
 {
 	switch (optype)
 	{
-	case xyz: return "xyz";
-	case xy_inverse_z: return "inverse_depth";
-	case depth: return "spherical";
-	case inverse_depth: return "inverse_distance";
-	case archored_xyz: return "anchored_xyz";
-	case archored_xy_inverse_z: return "anchored_inverse_depth";
-	case archored_depth: return "anchored_spherical";
-	case archored_inverse_depth: return "anchored_inverse_distance";
-	case parallax: return "parallax";
+	case xyz: return "world_cartesian_xyz";
+	case xy_inverse_z: return "world_xy_inverse_z";
+	case depth: return "world_bearing_range";
+	case inverse_depth: return "world_bearing_inverse_range";
+	case archored_xyz: return "anchored_cartesian_xyz";
+	case archored_xy_inverse_z: return "anchored_xy_inverse_z";
+	case archored_depth: return "anchored_bearing_range";
+	case archored_inverse_depth: return "anchored_bearing_inverse_range";
+	case parallax: return "dual_anchor_bearing_parallax";
 	default: return "unknown";
 	}
 }
@@ -64,14 +64,14 @@ const char* anchorModeName(objectpointtype optype)
 	case xy_inverse_z:
 	case depth:
 	case inverse_depth:
-		return "zero_anchor";
+		return "world_frame";
 	case archored_xyz:
 	case archored_xy_inverse_z:
 	case archored_depth:
 	case archored_inverse_depth:
 		return "single_anchor";
 	case parallax:
-		return "double_anchor";
+		return "dual_anchor";
 	default:
 		return "unknown";
 	}
