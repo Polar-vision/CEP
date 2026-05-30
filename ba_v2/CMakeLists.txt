@@ -4,24 +4,33 @@ project(ba)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-
-if(NOT EIGEN3_INCLUDE_DIR)
-    message(FATAL_ERROR "Please specify EIGEN3_INCLUDE_DIR, e.g., -DEIGEN3_INCLUDE_DIR=/path/to/eigen3")
-endif()
-
-
-if(NOT SOPHUS_INCLUDE_DIR)
-    message(FATAL_ERROR "Please specify SOPHUS_INCLUDE_DIR, e.g., -DSOPHUS_INCLUDE_DIR=/path/to/sophus/include")
-endif()
-
-
 if (VCPKG_INSTALLED_DIR AND VCPKG_TARGET_TRIPLET)
     list(INSERT CMAKE_PREFIX_PATH 0 "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
     list(INSERT CMAKE_MODULE_PATH 0 "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share")
 endif()
 
+set(DEFAULT_CERES_DIR "C:/zuo/Projects/repos/ceres-solver-install/lib/cmake/Ceres")
+if(NOT Ceres_DIR AND EXISTS "${DEFAULT_CERES_DIR}/CeresConfig.cmake")
+    set(Ceres_DIR "${DEFAULT_CERES_DIR}" CACHE PATH "Path to CeresConfig.cmake" FORCE)
+endif()
 
 find_package(Ceres REQUIRED)
+find_package(Eigen3 REQUIRED)
+find_package(Sophus CONFIG QUIET)
+
+if(Sophus_FOUND)
+    set(CEP_SOPHUS_TARGET Sophus::Sophus)
+elseif(NOT SOPHUS_INCLUDE_DIR)
+    if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/Sophus")
+        set(SOPHUS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/Sophus" CACHE PATH "Path to Sophus include directory")
+    elseif(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/Sophus/install/include")
+        set(SOPHUS_INCLUDE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../3rdparty/Sophus/install/include" CACHE PATH "Path to Sophus include directory")
+    elseif(DEFINED VCPKG_INSTALLED_DIR AND DEFINED VCPKG_TARGET_TRIPLET AND EXISTS "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include/sophus")
+        set(SOPHUS_INCLUDE_DIR "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/include" CACHE PATH "Path to Sophus include directory")
+    else()
+        message(FATAL_ERROR "Please specify SOPHUS_INCLUDE_DIR, e.g. -DSOPHUS_INCLUDE_DIR=/path/to/sophus/include")
+    endif()
+endif()
 
 
 set(SOURCES
@@ -36,13 +45,13 @@ set(BA_INCLUDE_DIR "${CMAKE_SOURCE_DIR}/include")
 
 add_library(ba STATIC ${SOURCES})
 target_compile_definitions(ba PRIVATE BA_STATIC)
+set_target_properties(ba PROPERTIES OUTPUT_NAME "ba_static")
 target_include_directories(ba PRIVATE
     ${CMAKE_SOURCE_DIR}
     ${BA_INCLUDE_DIR}
-    ${EIGEN3_INCLUDE_DIR}
     ${SOPHUS_INCLUDE_DIR}
 )
-target_link_libraries(ba PRIVATE ${CERES_LIBRARIES})
+target_link_libraries(ba PRIVATE Ceres::ceres Eigen3::Eigen ${CEP_SOPHUS_TARGET})
 
 
 add_library(ba_shared SHARED ${SOURCES})
@@ -50,10 +59,9 @@ target_compile_definitions(ba_shared PRIVATE BA_EXPORTS)
 target_include_directories(ba_shared PRIVATE
     ${CMAKE_SOURCE_DIR}
     ${BA_INCLUDE_DIR}
-    ${EIGEN3_INCLUDE_DIR}
     ${SOPHUS_INCLUDE_DIR}
 )
-target_link_libraries(ba_shared PRIVATE ${CERES_LIBRARIES})
+target_link_libraries(ba_shared PRIVATE Ceres::ceres Eigen3::Eigen ${CEP_SOPHUS_TARGET})
 set_target_properties(ba_shared PROPERTIES OUTPUT_NAME "ba")
 add_custom_command(TARGET ba_shared POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different

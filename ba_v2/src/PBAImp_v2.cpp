@@ -1334,7 +1334,7 @@ bool PBA::ba_run(char* szCam,
 	options.max_num_iterations = 100;  
 	// options.trust_region_strategy_type = ceres::DOGLEG;         
 	options.linear_solver_type = ceres::SPARSE_SCHUR;            
-	options.sparse_linear_algebra_library_type = ceres::CUDA_SPARSE;
+	options.sparse_linear_algebra_library_type = ceres::SUITE_SPARSE;
 
 	if(iptype==light_cone){
 		options.callbacks.push_back(callback);
@@ -1443,7 +1443,7 @@ bool PBA::ba_run(char* szCam,
 		options.max_num_iterations = 100;  
 		// options.trust_region_strategy_type = ceres::DOGLEG;         
 		options.linear_solver_type = ceres::SPARSE_SCHUR;            
-		options.sparse_linear_algebra_library_type = ceres::CUDA_SPARSE;
+		options.sparse_linear_algebra_library_type = ceres::SUITE_SPARSE;
 
 		options.callbacks.push_back(callback);
 		options.update_state_every_iteration = true; 

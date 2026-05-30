@@ -6,11 +6,25 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>DLL")
 set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:CONSOLE")
 
+if (VCPKG_INSTALLED_DIR AND VCPKG_TARGET_TRIPLET)
+    list(INSERT CMAKE_PREFIX_PATH 0 "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}")
+    list(INSERT CMAKE_MODULE_PATH 0 "${VCPKG_INSTALLED_DIR}/${VCPKG_TARGET_TRIPLET}/share")
+endif()
+
+set(DEFAULT_CERES_DIR "C:/zuo/Projects/repos/ceres-solver-install/lib/cmake/Ceres")
+if(NOT Ceres_DIR AND EXISTS "${DEFAULT_CERES_DIR}/CeresConfig.cmake")
+    set(Ceres_DIR "${DEFAULT_CERES_DIR}" CACHE PATH "Path to CeresConfig.cmake" FORCE)
+endif()
+
 find_package(Ceres REQUIRED)
 
 set(BA_PROJECT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../ba_v2")
 set(BA_INCLUDE_DIR "${BA_PROJECT_DIR}/include")
-set(BA_BUILD_DIR   "${BA_PROJECT_DIR}/build/$<CONFIG>")  # Debug/Release 自动切换
+if(CMAKE_CONFIGURATION_TYPES)
+    set(BA_LIB_DIR "${BA_PROJECT_DIR}/build/$<CONFIG>")
+else()
+    set(BA_LIB_DIR "${BA_PROJECT_DIR}/build")
+endif()
 
 set(SOURCES
     example.cpp
@@ -25,13 +39,13 @@ target_include_directories(example PRIVATE
 )
 
 target_link_libraries(example PRIVATE
-    "${BA_BUILD_DIR}/ba.lib"
-    ${CERES_LIBRARIES}
+    "${BA_LIB_DIR}/ba.lib"
+    Ceres::ceres
 )
 
 add_custom_command(TARGET example POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${BA_BUILD_DIR}/ba.dll"
+    "${BA_LIB_DIR}/ba.dll"
     $<TARGET_FILE_DIR:example>
 )
 
