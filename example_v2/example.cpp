@@ -205,7 +205,7 @@ void writeComparisonTables(const fs::path& dataset_dir, const vector<RunRecord>&
 int main(int argc, char* argv[] )
 {
 	fs::path executableDir = fs::absolute(argv[0]).parent_path();
-	fs::path dataPath = fs::path(dt);
+	fs::path dataPath = argc > 1 ? fs::path(argv[1]) : fs::path(dt);
 	if (dataPath.is_relative()) {
 		dataPath = executableDir / dataPath;
 	}
