@@ -26,6 +26,18 @@ else()
     set(BA_LIB_DIR "${BA_PROJECT_DIR}/build")
 endif()
 
+set(COPY_BA_RUNTIME_DLLS_SCRIPT "${CMAKE_CURRENT_BINARY_DIR}/copy_ba_runtime_dlls.cmake")
+file(WRITE "${COPY_BA_RUNTIME_DLLS_SCRIPT}" [=[
+if(NOT EXISTS "${src_dir}")
+    message(FATAL_ERROR "BA runtime directory does not exist: ${src_dir}")
+endif()
+
+file(GLOB runtime_dlls "${src_dir}/*.dll")
+foreach(runtime_dll IN LISTS runtime_dlls)
+    file(COPY "${runtime_dll}" DESTINATION "${dst_dir}")
+endforeach()
+]=])
+
 set(SOURCES
     example.cpp
 )
@@ -44,9 +56,11 @@ target_link_libraries(example PRIVATE
 )
 
 add_custom_command(TARGET example POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-    "${BA_LIB_DIR}/ba.dll"
-    $<TARGET_FILE_DIR:example>
+    COMMAND ${CMAKE_COMMAND}
+    "-Dsrc_dir=${BA_LIB_DIR}"
+    "-Ddst_dir=$<TARGET_FILE_DIR:example>"
+    -P "${COPY_BA_RUNTIME_DLLS_SCRIPT}"
+    VERBATIM
 )
 
 add_custom_command(TARGET example POST_BUILD
