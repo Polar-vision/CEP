@@ -242,11 +242,11 @@ def best_methods_for_noise(summaries, label):
     return sorted(rows, key=lambda r: (float(r["mean_final_rms_px"]), float(r["mean_time_sec"])))
 
 
-def write_report(path, summaries, all_rows):
+def write_report(path, summaries, all_rows, levels, dataset_label):
     path = Path(path)
     with path.open("w", newline="\n") as f:
         f.write("# BA Noise Parameterization Experiment\n\n")
-        f.write("Dataset: `Close-Range/CR1-problem-11-9611/Ground Truth`\n\n")
+        f.write(f"Dataset: `{dataset_label}`\n\n")
         f.write(
             "Noise is added to the initial `Cam.txt` Euler angles/camera centers and "
             "initial `XYZ.txt` point coordinates. `Feature.txt` and `cal.txt` are kept fixed.\n\n"
@@ -254,13 +254,13 @@ def write_report(path, summaries, all_rows):
         f.write("## Noise Levels\n\n")
         f.write("| Level | Rotation sigma(deg) | Camera sigma(m) | Point sigma(m) | Seeds |\n")
         f.write("| --- | ---: | ---: | ---: | ---: |\n")
-        for label, rot, cam, point, seeds in NOISE_LEVELS:
+        for label, rot, cam, point, seeds in levels:
             f.write(f"| {label} | {rot:g} | {cam:g} | {point:g} | {len(seeds)} |\n")
 
         f.write("\n## Winners By Final Reprojection RMS\n\n")
         f.write("| Noise | Best method | Anchor | Final RMS(px) | Iter | Time(s) | Point RMSE(m) | Camera RMSE(m) | Rot RMSE(deg) |\n")
         f.write("| --- | --- | --- | ---: | ---: | ---: | ---: | ---: | ---: |\n")
-        for label, *_ in NOISE_LEVELS:
+        for label, *_ in levels:
             best = best_methods_for_noise(summaries, label)[0]
             f.write(
                 f"| {label} | {best['method']} | {best['anchor_mode']} | "
@@ -301,7 +301,7 @@ def write_report(path, summaries, all_rows):
         for row in summaries:
             by_noise[row["noise_label"]].append(row)
         f.write("\n## Compact Conclusions\n\n")
-        for label, *_ in NOISE_LEVELS:
+        for label, *_ in levels:
             rows = sorted(by_noise[label], key=lambda r: float(r["mean_final_rms_px"]))
             best = rows[0]
             runners = ", ".join(r["method"] for r in rows[:3])
@@ -326,18 +326,36 @@ def main():
         default=r"C:\zuo\Projects\repos\CEP\example_v2\build\example.exe",
     )
     parser.add_argument("--force", action="store_true")
+    parser.add_argument(
+        "--levels",
+        default=",".join(level[0] for level in NOISE_LEVELS),
+        help="Comma-separated noise labels to run, for example: clean,large,severe",
+    )
+    parser.add_argument(
+        "--timeout-sec",
+        type=int,
+        default=300,
+        help="Timeout for each dataset variant. One variant runs all 9 BA methods.",
+    )
     args = parser.parse_args()
 
     gt_dir = Path(args.gt_dir)
     out_root = Path(args.out_root)
     example_exe = Path(args.example_exe)
+    selected_names = {name.strip() for name in args.levels.split(",") if name.strip()}
+    selected_levels = [level for level in NOISE_LEVELS if level[0] in selected_names]
+    unknown_levels = selected_names - {level[0] for level in NOISE_LEVELS}
+    if unknown_levels:
+        raise ValueError(f"Unknown levels: {', '.join(sorted(unknown_levels))}")
+    if not selected_levels:
+        raise ValueError("No noise levels selected")
 
     if args.force and out_root.exists():
         shutil.rmtree(out_root)
     out_root.mkdir(parents=True, exist_ok=True)
 
     all_rows = []
-    for label, rot_noise_deg, cam_noise_m, point_noise_m, seeds in NOISE_LEVELS:
+    for label, rot_noise_deg, cam_noise_m, point_noise_m, seeds in selected_levels:
         for seed in seeds:
             variant_dir = out_root / f"{label}_seed{seed}"
             gt_cam, gt_xyz, initial_cam, initial_xyz = generate_variant(
@@ -353,7 +371,7 @@ def main():
                     stderr=subprocess.STDOUT,
                     text=True,
                     cwd=str(example_exe.parent),
-                    timeout=300,
+                    timeout=args.timeout_sec,
                 )
             if completed.returncode != 0:
                 raise RuntimeError(f"example.exe failed for {variant_dir}, see {log_path}")
@@ -413,7 +431,7 @@ def main():
         "mean_final_rotation_rmse_deg",
     ]
     write_csv(out_root / "noise-experiment-summary.csv", summaries, summary_fields)
-    write_report(out_root / "noise-experiment-report.md", summaries, all_rows)
+    write_report(out_root / "noise-experiment-report.md", summaries, all_rows, selected_levels, str(gt_dir))
     print(f"Wrote {out_root / 'noise-experiment-report.md'}")
 
 
